@@ -17,36 +17,59 @@ last_names = [
     'Sharma', 'Verma', 'Kumar', 'Yadav', 'Singh', 'Patel', 'Gupta', 'Mishra', 'Reddy', 'Joshi',
     'Nair', 'Chopra', 'Mehta', 'Pillai', 'Desai', 'Malhotra', 'Bansal', 'Kapoor', 'Trivedi', 'Chatterjee'
 ]
+
+# Generate random full name
 def generate_random_name():
     return f"{random.choice(first_names)} {random.choice(last_names)}"
 
+# Generate passing marks
 def generate_pass_marks():
-    # Generate marks where all subjects are >= 50
     return [random.randint(50, 100) for _ in SUBJECTS]
 
+# Generate failing marks
 def generate_fail_marks():
-    # Make at least one subject < 50
     marks = [random.randint(50, 100) for _ in SUBJECTS]
     fail_index = random.randint(0, len(SUBJECTS)-1)
-    marks[fail_index] = random.randint(0, 30)
+    marks[fail_index] = random.randint(0, 30)  # force fail
     return marks
+
+# Function to calculate grade
+def calculate_grade(avg):
+    if avg >= 90:
+        return 'A+'
+    elif avg >= 80:
+        return 'A'
+    elif avg >= 70:
+        return 'B'
+    elif avg >= 60:
+        return 'C'
+    elif avg >= 50:
+        return 'D'
+    else:
+        return 'F'
 
 data = []
 
 for _ in range(NUM_STUDENTS):
     name = generate_random_name()
-    if random.random() < 0.7:  
+    
+    # 70% pass, 30% fail
+    if random.random() < 0.7:
         marks = generate_pass_marks()
         result = 1
-    else:  
+    else:
         marks = generate_fail_marks()
         result = 0
-    record = [name] + marks + [result]
+    
+    avg_marks = sum(marks) / len(SUBJECTS)
+    grade = calculate_grade(avg_marks)
+    
+    record = [name] + marks + [result, avg_marks, grade]
     data.append(record)
 
-columns = ['Name'] + SUBJECTS + ['Final_Result']
+columns = ['Name'] + SUBJECTS + ['Final_Result', 'Average_Marks', 'Course_Grade']
 df = pd.DataFrame(data, columns=columns)
 
-df.to_csv('student_results.csv', index=False)
+df.to_csv('student_results_with_grades.csv', index=False)
 
-print("CSV file 'student_results.csv' created with 70% passing students.")
+print("CSV file 'student_results_with_grades.csv' created with course grades.")
